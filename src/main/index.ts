@@ -1,74 +1,88 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { randomUUID } from 'node:crypto'
+import { join } from 'node:path'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { AtomicJsonStore } from './atomic-json-store'
+import { appendTaskEvent } from './obsidian-log'
+import { QuestApplication } from './quest-application'
+import { emptyAppState, type CreateQuestRequest, type UpdateQuestRequest } from '../shared/state'
+
+let questApplication: QuestApplication
+
+function registerIpc(): void {
+  ipcMain.handle('questlog:load', () => questApplication.loadState())
+  ipcMain.handle('questlog:create', (_event, input: CreateQuestRequest) =>
+    questApplication.createQuest(input)
+  )
+  ipcMain.handle('questlog:update', (_event, input: UpdateQuestRequest) =>
+    questApplication.updateQuest(input)
+  )
+  ipcMain.handle('questlog:complete', (_event, id: string) => questApplication.completeQuest(id))
+  ipcMain.handle('questlog:reopen', (_event, id: string) => questApplication.reopenQuest(id))
+  ipcMain.handle('questlog:delete', (_event, id: string) => questApplication.deleteQuest(id))
+  ipcMain.handle('questlog:retry-logs', () => questApplication.retryLogs())
+  ipcMain.handle('questlog:select-vault', async () => {
+    const result = await dialog.showOpenDialog({
+      title: 'Choose your Obsidian vault',
+      properties: ['openDirectory', 'createDirectory']
+    })
+    if (result.canceled || !result.filePaths[0]) return questApplication.loadState()
+    await questApplication.setVaultPath(result.filePaths[0])
+    return (await questApplication.retryLogs()).state
+  })
+  ipcMain.handle('questlog:show-data-folder', async () => {
+    await shell.openPath(app.getPath('userData'))
+  })
+}
 
 function createWindow(): void {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1320,
+    height: 820,
+    minWidth: 900,
+    minHeight: 640,
     show: false,
+    title: 'QuestLog — Enchanted Archive',
+    backgroundColor: '#182019',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+  mainWindow.on('ready-to-show', () => mainWindow.show())
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    void mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    void mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.oliwiajasionek.questlog')
+  const dataFilePath = join(app.getPath('userData'), 'questlog-state.json')
+  questApplication = new QuestApplication(
+    new AtomicJsonStore(dataFilePath, emptyAppState),
+    { append: appendTaskEvent },
+    { uuid: randomUUID, eventId: randomUUID, now: () => new Date() },
+    dataFilePath
+  )
+  registerIpc()
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
+  app.on('browser-window-created', (_, window) => optimizer.watchWindowShortcuts(window))
   createWindow()
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
+  app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  if (process.platform !== 'darwin') app.quit()
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

@@ -10,7 +10,7 @@ import {
 
 const now = new Date('2026-09-25T10:15:00+02:00')
 
-function makeQuest() {
+function makeQuest(): ReturnType<typeof createQuest> {
   return createQuest(
     {
       title: 'Prototype usability flow',
@@ -77,8 +77,16 @@ describe('quest discovery', () => {
       ),
       now
     )
-    expect(filterQuests([active, completed], { query: 'observation', course: 'Interaction Design', status: 'active' })).toEqual([active])
-    expect(filterQuests([active, completed], { query: 'affinity', course: 'all', status: 'completed' })).toEqual([completed])
+    expect(
+      filterQuests([active, completed], {
+        query: 'observation',
+        course: 'Interaction Design',
+        status: 'active'
+      })
+    ).toEqual([active])
+    expect(
+      filterQuests([active, completed], { query: 'affinity', course: 'all', status: 'completed' })
+    ).toEqual([completed])
   })
 
   it('builds Today’s Journey from overdue, due-today, and important active quests', () => {
@@ -87,10 +95,10 @@ describe('quest discovery', () => {
     const important = { ...makeQuest(), id: 'important', dueDate: '2026-10-01', important: true }
     const later = { ...makeQuest(), id: 'later', dueDate: '2026-10-01' }
     const completed = { ...dueToday, id: 'done', status: 'completed' as const }
-    expect(getTodaysJourney([later, completed, important, overdue, dueToday], '2026-09-25').map((quest) => quest.id)).toEqual([
-      'overdue',
-      dueToday.id,
-      'important'
-    ])
+    expect(
+      getTodaysJourney([later, completed, important, overdue, dueToday], '2026-09-25').map(
+        (quest) => quest.id
+      )
+    ).toEqual(['overdue', dueToday.id, 'important'])
   })
 })

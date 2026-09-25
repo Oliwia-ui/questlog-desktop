@@ -1,11 +1,7 @@
 import type { EditableQuestField, Quest } from './domain'
 
 export type TaskEventType =
-  | 'TASK_CREATED'
-  | 'TASK_EDITED'
-  | 'TASK_COMPLETED'
-  | 'TASK_REOPENED'
-  | 'TASK_DELETED'
+  'TASK_CREATED' | 'TASK_EDITED' | 'TASK_COMPLETED' | 'TASK_REOPENED' | 'TASK_DELETED'
 
 export interface TaskEvent {
   id: string

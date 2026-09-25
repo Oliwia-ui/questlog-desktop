@@ -1,8 +1,9 @@
-import { ElectronAPI } from '@electron-toolkit/preload'
+import type { QuestLogApi } from '../shared/state'
 
 declare global {
   interface Window {
-    electron: ElectronAPI
-    api: unknown
+    questLog: QuestLogApi
   }
 }
+
+export {}

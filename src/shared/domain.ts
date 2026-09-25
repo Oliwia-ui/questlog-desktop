@@ -28,7 +28,13 @@ export interface DomainDependencies {
   now: () => Date
 }
 
-const editableFields: EditableQuestField[] = ['title', 'description', 'course', 'dueDate', 'important']
+const editableFields: EditableQuestField[] = [
+  'title',
+  'description',
+  'course',
+  'dueDate',
+  'important'
+]
 
 export function createQuest(input: QuestInput, dependencies: DomainDependencies): Quest {
   const title = input.title.trim()
@@ -89,9 +95,12 @@ export interface QuestFilters {
 export function filterQuests(quests: Quest[], filters: QuestFilters): Quest[] {
   const query = filters.query?.trim().toLocaleLowerCase() ?? ''
   return quests.filter((quest) => {
-    const matchesQuery = !query || `${quest.title} ${quest.description}`.toLocaleLowerCase().includes(query)
-    const matchesCourse = !filters.course || filters.course === 'all' || quest.course === filters.course
-    const matchesStatus = !filters.status || filters.status === 'all' || quest.status === filters.status
+    const matchesQuery =
+      !query || `${quest.title} ${quest.description}`.toLocaleLowerCase().includes(query)
+    const matchesCourse =
+      !filters.course || filters.course === 'all' || quest.course === filters.course
+    const matchesStatus =
+      !filters.status || filters.status === 'all' || quest.status === filters.status
     return matchesQuery && matchesCourse && matchesStatus
   })
 }

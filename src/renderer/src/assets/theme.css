@@ -1,0 +1,105 @@
+/*
+ * QUESTLOG VISUAL TOKENS
+ * Change this file first when restyling the app. Component CSS should consume
+ * these semantic tokens instead of introducing new theme values.
+ */
+:root {
+  /* Color */
+  --color-night-950: #101612;
+  --color-night-900: #182019;
+  --color-night-850: #1f2a21;
+  --color-moss-700: #344839;
+  --color-moss-500: #647c66;
+  --color-parchment-50: #fbf6e9;
+  --color-parchment-100: #f3ead4;
+  --color-parchment-200: #e9dcc0;
+  --color-ink-900: #29291f;
+  --color-ink-700: #4e4b3c;
+  --color-ink-500: #76705d;
+  --color-spirit-500: #83cbb8;
+  --color-spirit-300: #b9e7d9;
+  --color-amber-500: #c79748;
+  --color-ruby-500: #a7524b;
+  --color-success: #58755f;
+  --color-danger: #934b44;
+  --color-danger-dark: #7c3e38;
+  --color-line: rgba(72, 65, 48, 0.18);
+  --color-focus-ring: rgba(81, 136, 119, 0.38);
+  --color-surface-translucent: rgba(255, 252, 244, 0.55);
+
+  /* Semantic aliases consumed by component styles */
+  --night-950: var(--color-night-950);
+  --night-900: var(--color-night-900);
+  --night-850: var(--color-night-850);
+  --moss-700: var(--color-moss-700);
+  --moss-500: var(--color-moss-500);
+  --parchment-50: var(--color-parchment-50);
+  --parchment-100: var(--color-parchment-100);
+  --parchment-200: var(--color-parchment-200);
+  --ink-900: var(--color-ink-900);
+  --ink-700: var(--color-ink-700);
+  --ink-500: var(--color-ink-500);
+  --spirit-500: var(--color-spirit-500);
+  --spirit-300: var(--color-spirit-300);
+  --amber-500: var(--color-amber-500);
+  --ruby-500: var(--color-ruby-500);
+  --line: var(--color-line);
+
+  /* Typography */
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-body: 'Avenir Next', Avenir, 'Gill Sans', 'Trebuchet MS', sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, monospace;
+  --serif: var(--font-display);
+  --sans: var(--font-body);
+  --mono: var(--font-mono);
+  --text-xs: 8px;
+  --text-sm: 9px;
+  --text-ui: 10px;
+  --text-body: 11px;
+  --text-subtitle: 12px;
+  --text-title: 32px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 10px;
+  --space-5: 12px;
+  --space-6: 14px;
+  --space-7: 16px;
+  --space-8: 18px;
+  --space-9: 20px;
+  --space-10: 24px;
+  --space-11: 28px;
+  --space-12: 30px;
+  --space-13: 34px;
+  --space-14: 40px;
+  --space-15: 44px;
+
+  /* Shape */
+  --radius-control: 7px;
+  --radius-card: 9px;
+  --radius-panel: 11px;
+  --radius-dialog: 12px;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-card: 0 2px 5px rgba(71, 57, 33, 0.045);
+  --shadow-card-selected: 0 7px 18px rgba(67, 57, 37, 0.08), inset 3px 0 #58755f;
+  --shadow-panel: -9px 0 24px rgba(42, 34, 20, 0.07);
+  --shadow-dialog: 0 30px 90px rgba(0, 0, 0, 0.55);
+  --shadow-toast: 0 12px 38px rgba(0, 0, 0, 0.3);
+  --shadow-spirit: 0 0 24px rgba(131, 203, 184, 0.13);
+
+  /* Motion */
+  --motion-fast: 150ms;
+  --motion-normal: 200ms;
+  --motion-slow: 1400ms;
+  --ease-standard: ease;
+
+  /* Layout */
+  --sidebar-width: 236px;
+  --inspector-width: 370px;
+  --content-min-width: 420px;
+  --window-min-width: 900px;
+}

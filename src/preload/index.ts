@@ -1,22 +1,17 @@
-import { contextBridge } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
+import type { CreateQuestRequest, QuestLogApi, UpdateQuestRequest } from '../shared/state'
 
-// Custom APIs for renderer
-const api = {}
-
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
-if (process.contextIsolated) {
-  try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
-  } catch (error) {
-    console.error(error)
-  }
-} else {
-  // @ts-ignore (define in dts)
-  window.electron = electronAPI
-  // @ts-ignore (define in dts)
-  window.api = api
+const questLog: QuestLogApi = {
+  loadState: () => ipcRenderer.invoke('questlog:load'),
+  createQuest: (input: CreateQuestRequest) => ipcRenderer.invoke('questlog:create', input),
+  updateQuest: (input: UpdateQuestRequest) => ipcRenderer.invoke('questlog:update', input),
+  completeQuest: (id: string) => ipcRenderer.invoke('questlog:complete', id),
+  reopenQuest: (id: string) => ipcRenderer.invoke('questlog:reopen', id),
+  deleteQuest: (id: string) => ipcRenderer.invoke('questlog:delete', id),
+  selectVault: () => ipcRenderer.invoke('questlog:select-vault'),
+  retryLogs: () => ipcRenderer.invoke('questlog:retry-logs'),
+  showDataFolder: () => ipcRenderer.invoke('questlog:show-data-folder')
 }
+
+if (!process.contextIsolated) throw new Error('QuestLog requires context isolation.')
+contextBridge.exposeInMainWorld('questLog', questLog)
